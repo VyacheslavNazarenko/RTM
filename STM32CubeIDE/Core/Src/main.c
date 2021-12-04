@@ -87,32 +87,55 @@ int main(void)
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
 
+	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_8);
+	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
+	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
+	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_11);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_11);
-  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_12);
-  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_13);
-
   while (1)
   {
+	if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15) == GPIO_PIN_RESET){
+		if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8) == GPIO_PIN_RESET){
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_8);
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
+		} else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9) == GPIO_PIN_RESET) {
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
+		} else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10) == GPIO_PIN_RESET) {
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_11);
+		} else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_11) == GPIO_PIN_RESET) {
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_11);
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_8);
+		} else {
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_8);
+		}
 
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_11);
-	  HAL_Delay(500);
+		HAL_Delay(300);
+	}
 
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_11);
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_12);
-	  HAL_Delay(500);
+	if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14) == GPIO_PIN_RESET){
+		if(HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8) == GPIO_PIN_SET){
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_8);
+		} else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9) == GPIO_PIN_SET){
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_9);
+		} else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10) == GPIO_PIN_SET){
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
+		} else if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_11) == GPIO_PIN_SET){
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_11);
+		} else {
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
+		}
+		HAL_Delay(300);
+	}
 
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_12);
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_13);
-	  HAL_Delay(500);
-
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_13);
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
-	  HAL_Delay(500);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
