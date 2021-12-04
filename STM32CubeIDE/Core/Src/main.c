@@ -19,7 +19,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -41,13 +40,16 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
-
+uint8_t spi_buf[2] = {0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -85,34 +87,26 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+  HAL_GPIO_WritePin(SS_74HC165_GPIO_Port, SS_74HC165_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(SS_74HC595_GPIO_Port, SS_74HC595_Pin, GPIO_PIN_SET);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_11);
-  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_12);
-  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_13);
-
   while (1)
   {
+	  HAL_GPIO_WritePin(SS_74HC165_GPIO_Port, SS_74HC165_Pin, GPIO_PIN_RESET); //SPI chip select
+	    //HAL_SPI_Receive(&hspi1, (uint8_t *)spi_buf, 1, 100);
+	    HAL_GPIO_WritePin(SS_74HC165_GPIO_Port, SS_74HC165_Pin, GPIO_PIN_SET); //SPI chip deselecet
+	    HAL_SPI_Receive(&hspi1, (uint8_t *)spi_buf, 2, 100);
 
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_11);
-	  HAL_Delay(500);
+	    HAL_GPIO_WritePin(SS_74HC595_GPIO_Port, SS_74HC595_Pin, GPIO_PIN_RESET); //SPI chip select
+	    HAL_SPI_Transmit(&hspi1, (uint8_t *)spi_buf, 2, 100);
+	    HAL_GPIO_WritePin(SS_74HC595_GPIO_Port, SS_74HC595_Pin, GPIO_PIN_SET); //SPI chip deselecet
 
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_11);
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_12);
-	  HAL_Delay(500);
-
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_12);
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_13);
-	  HAL_Delay(500);
-
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_13);
-	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_10);
-	  HAL_Delay(500);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -153,6 +147,69 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief SPI1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI1_Init(void)
+{
+
+  /* USER CODE BEGIN SPI1_Init 0 */
+
+  /* USER CODE END SPI1_Init 0 */
+
+  /* USER CODE BEGIN SPI1_Init 1 */
+
+  /* USER CODE END SPI1_Init 1 */
+  /* SPI1 parameter configuration*/
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI1_Init 2 */
+
+  /* USER CODE END SPI1_Init 2 */
+
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, SS_74HC165_Pin|SS_74HC595_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : SS_74HC165_Pin SS_74HC595_Pin */
+  GPIO_InitStruct.Pin = SS_74HC165_Pin|SS_74HC595_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
 }
 
 /* USER CODE BEGIN 4 */
